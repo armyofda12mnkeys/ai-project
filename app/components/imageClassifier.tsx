@@ -11,6 +11,10 @@ export default function ImageClassifier() {
 	const [submitted, setSubmitted] = useState(false);
 	const [inputKey, setInputKey] = useState(new Date().toString());
 
+	const [audioIsLoading, setAudioIsLoading] = useState(false);
+	const [audio, setAudio] = useState<string | null>(null);
+	const [voiceType, setVoiceType] = useState<string>('fable');
+
 	/*useEffect(() => {
 		console.log('change!!!');
 		console.log(response);
@@ -90,9 +94,6 @@ export default function ImageClassifier() {
 							//return;
 							setResponse((prev) => `${prev}${temp}`);
 
-							//let audio_response = client.audio.speech.create((model = 'tts-1'), (voice = 'alloy'), (input = temp));
-							//audio_response.stream_to_file('output.mp3');
-
 							return pump();
 						});
 					}
@@ -109,6 +110,9 @@ export default function ImageClassifier() {
 		setResponse('');
 		setSubmitted(false);
 		setInputKey(new Date().toString());
+		setAudio(null);
+		setAudioIsLoading(false);
+		setVoiceType('fable');
 	};
 
 	return (
@@ -145,6 +149,52 @@ export default function ImageClassifier() {
 					<button className="bg-white hover:bg-red-100 text-red-800 font-semibold py-2 px-4 border border-red-400 rounded shadow" type="button" onClick={onReset}>
 						Reset
 					</button>
+				</div>
+				<div className="flex flex-col justify-center mb-2 items-center">
+					{response && !audioIsLoading && !audio && (
+						<>
+							<select
+								value={voiceType} // ...force the select's value to match the state variable...
+								onChange={(e) => setVoiceType(e.target.value)} // ... and update the state variable on any change!
+							>
+								<option value="alloy">alloy</option>
+								<option value="echo">echo</option>
+								<option value="fable">fable</option>
+								<option value="onyx">onyx</option>
+								<option value="nova">nova</option>
+								<option value="shimmer">shimmer</option>
+							</select>
+							<button
+								className="bg-blue-500 p-2 text-white rounded shadow-xl"
+								onClick={async () => {
+									setAudioIsLoading(true);
+									const resp = await fetch('/api/audio', {
+										method: 'POST',
+										headers: {
+											'Content-Type': 'application/json',
+										},
+										body: JSON.stringify({
+											message: response,
+											voiceType: voiceType,
+										}),
+									});
+									const audioBlob = await resp.blob();
+									const audioUrl = URL.createObjectURL(audioBlob);
+									setAudio(audioUrl);
+									setAudioIsLoading(false);
+								}}
+							>
+								Generate Audio
+							</button>
+						</>
+					)}
+					{audioIsLoading && !audio && <p> Audio is being generated... </p>}
+					{audio && (
+						<>
+							<p> Listen to the description of the image: </p>
+							<audio controls src={audio} className="w-full"></audio>
+						</>
+					)}
 				</div>
 			</form>
 		</div>
