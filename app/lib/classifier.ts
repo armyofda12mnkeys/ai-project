@@ -1,76 +1,51 @@
-import { OpenAI } from "openai";
-
-import { OpenAIStream } from "ai";
-
-
+import { OpenAI } from 'openai';
+import { OpenAIStream } from 'ai';
 
 // create a new OpenAI client using our key from earlier
 
 const openAi = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-
-
 export const classifyImage = async (file: File) => {
+	// encode our file as a base64 string so it can be sent in an HTTP request
+	const encoded = await file
 
-  // encode our file as a base64 string so it can be sent in an HTTP request
+		.arrayBuffer()
 
-  const encoded = await file
+		.then((buffer) => Buffer.from(buffer).toString('base64'));
 
-    .arrayBuffer()
+	// create an OpenAI request with a prompt
 
-    .then((buffer) => Buffer.from(buffer).toString("base64"));
+	const completion = await openAi.chat.completions.create({
+		model: 'gpt-4-vision-preview',
 
+		messages: [
+			{
+				role: 'user',
 
+				content: [
+					{
+						type: 'text',
+						text: 'Describe this image as if you were a person from Boston with a thick accent, who also has to interupt often to go eat Lobster Rolls which he loves more than life. The description he gives should be about a paragraph long.',
+					},
 
-  // create an OpenAI request with a prompt
+					{
+						type: 'image_url',
 
-  const completion = await openAi.chat.completions.create({
+						image_url: {
+							url: `data:image/jpeg;base64,${encoded}`,
+						},
+					},
+				],
+			},
+		],
 
-    model: "gpt-4-vision-preview",
+		stream: true,
 
-    messages: [
+		max_tokens: 1000,
+	});
 
-      {
-
-        role: "user",
-
-        content: [
-
-          {
-
-            type: "text",
-            text: "Describe this image as if you were a person from Boston with a thick accent, who also has to interupt often to go eat Lobster Rolls which he loves more than life. The description he gives should be about a paragraph long.",
-
-          },
-
-          {
-
-            type: "image_url",
-
-            image_url: {
-
-              url: `data:image/jpeg;base64,${encoded}`,
-
-            },
-
-          },
-
-        ],
-
-      },
-
-    ],
-
-    stream: true,
-
-    max_tokens: 1000,
-
-  });
-
-
-
-  // stream the response
-
-  return OpenAIStream(completion);
-
+	// stream the response
+	console.log('##############################');
+	console.log(completion);
+	return OpenAIStream(completion);
 };
