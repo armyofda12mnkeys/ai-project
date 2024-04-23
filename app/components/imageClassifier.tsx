@@ -15,6 +15,7 @@ export default function ImageClassifier() {
 	const [audio, setAudio] = useState<string | null>(null);
 	const [voiceType, setVoiceType] = useState<string>('fable');
 
+	const [responseDone, setResponseDone] = useState(false);
 	/*useEffect(() => {
 		console.log('change!!!');
 		console.log(response);
@@ -46,6 +47,7 @@ export default function ImageClassifier() {
 							// no more data - exit our loop
 
 							if (done) {
+								setResponseDone(true);
 								controller.close();
 
 								return;
@@ -113,6 +115,7 @@ export default function ImageClassifier() {
 		setAudio(null);
 		setAudioIsLoading(false);
 		setVoiceType('fable');
+		setResponseDone(false);
 	};
 
 	return (
@@ -156,7 +159,7 @@ export default function ImageClassifier() {
 					</button>
 				</div>
 				<div className="flex flex-row mt-10">
-					{response && !audioIsLoading && !audio && (
+					{response && responseDone && !audioIsLoading && !audio && (
 						<>
 							<select
 								value={voiceType} // ...force the select's value to match the state variable...
