@@ -14,6 +14,7 @@ export default function ImageClassifier() {
 	const [audioIsLoading, setAudioIsLoading] = useState(false);
 	const [audio, setAudio] = useState<string | null>(null);
 	const [voiceType, setVoiceType] = useState<string>('fable');
+	const [describeAs, setDescribeAs] = useState<string>('Sending your pic to famous Bostonian, Matt Affleck. He will give a response describing your image. Describe this image as if you were a person from Boston with a thick accent, who also has to interupt often to go eat Lobster Rolls which he loves more than life. The description given should be about a paragraph long.');
 
 	const [responseDone, setResponseDone] = useState(false);
 	/*useEffect(() => {
@@ -30,6 +31,7 @@ export default function ImageClassifier() {
 		const formData = new FormData();
 
 		formData.append('file', file as File);
+		formData.append('describeAs', describeAs as string);
 
 		fetch('/api/classify', {
 			method: 'POST',
@@ -116,6 +118,7 @@ export default function ImageClassifier() {
 		setAudioIsLoading(false);
 		setVoiceType('fable');
 		setResponseDone(false);
+		setDescribeAs('Sending your pic to get evaluated Bostonian, Matt Affleck. He will give a response describing your image. Describe this image as if you were a person from Boston with a thick accent, who also has to interupt often to go eat Lobster Rolls which he loves more than life. The description given should be about a paragraph long.');
 	};
 
 	return (
@@ -147,12 +150,13 @@ export default function ImageClassifier() {
 					}}
 				/>
 
-				<p className="py-8 text-slate-800">{submitted && !response ? 'Sending your pic to famous Bostonian, Matt Afleck. He will give a response describing your image ...' : response}</p>
+				<p className="py-8 text-slate-800">{submitted && !response ? 'Sending your pic to get evaluated' : response}</p>
 
 				<div className="flex flex-row">
 					<button className={`${submitted || !file ? 'opacity-50' : 'hover:bg-indigo-500 text-white'} bg-blue-500 text-slate font-semibold p-2 border border-gray-400 rounded shadow`} type="submit" disabled={submitted || !file}>
 						Describe
 					</button>
+					<textarea value={describeAs} onChange={(e) => setDescribeAs(e.target.value)}></textarea>
 
 					<button className="bg-white hover:bg-red-100 text-red font-semibold p-2 border border-red-400 rounded shadow" type="button" onClick={onReset}>
 						Reset

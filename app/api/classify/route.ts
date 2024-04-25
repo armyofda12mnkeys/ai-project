@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
 	const data = await request.formData();
 
 	const file: File | null = data.get('file') as unknown as File;
+	const describeAs: string | null = data.get('describeAs') as string;
 
 	if (!file) {
 		return NextResponse.json(
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
 	}
 
 	//call our classify function and stream to the client
-	const response = await classifyImage(file);
+	const response = await classifyImage(file, describeAs);
 
 	return new StreamingTextResponse(response);
 }

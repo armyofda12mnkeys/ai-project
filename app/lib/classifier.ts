@@ -5,7 +5,7 @@ import { OpenAIStream } from 'ai';
 
 const openAi = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-export const classifyImage = async (file: File) => {
+export const classifyImage = async (file: File, describeAs: string) => {
 	// encode our file as a base64 string so it can be sent in an HTTP request
 	const encoded = await file
 
@@ -25,7 +25,8 @@ export const classifyImage = async (file: File) => {
 				content: [
 					{
 						type: 'text',
-						text: 'Describe this image as if you were a person from Boston with a thick accent, who also has to interupt often to go eat Lobster Rolls which he loves more than life. The description he gives should be about a paragraph long.',
+						text: describeAs,
+						//'Describe this image as if you were a person from Boston with a thick accent, who also has to interupt often to go eat Lobster Rolls which he loves more than life. The description given should be about a paragraph long.',
 					},
 
 					{
